@@ -3,6 +3,7 @@ import connectDB from "./config/db.js";
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import sweetRoutes from "./routes/sweetRoutes.js";
 import errorHandler from "./utils/errorHandler.js";
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(express.json()); // Parse JSON request body
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api", sweetRoutes);
 
 // Test root route
 app.get("/", (req, res) => {
