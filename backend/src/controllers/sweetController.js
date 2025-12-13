@@ -38,3 +38,119 @@ export const addSweet = async (req, res) => {
     });
   }
 };
+export const getAllSweets = async (req, res) => {
+  try {
+    const sweets = await Sweet.find();
+
+    res.status(200).json({
+      success: true,
+      count: sweets.length,
+      data: sweets,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const searchSweets = async (req, res) => {
+  try {
+    const { name, category, minPrice, maxPrice } = req.query;
+
+    let query = {};
+
+    if (name) {
+      query.name = { $regex: name, $options: "i" };
+    }
+
+    if (category) {
+      query.category = { $regex: category, $options: "i" };
+    }
+
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    const sweets = await Sweet.find(query);
+
+    res.status(200).json({
+      success: true,
+      count: sweets.length,
+      data: sweets,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const purchaseSweet = async (req, res) => {
+  try {
+    const { quantity } = req.body;
+    const sweet = await Sweet.findById(req.params.id);
+
+    if (!sweet) {
+      return res.status(404).json({
+        success: false,
+        message: "Sweet not found",
+      });
+    }
+
+    if (sweet.quantity < quantity) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient stock",
+      });
+    }
+
+    sweet.quantity -= quantity;
+    await sweet.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Sweet purchased successfully",
+      data: sweet,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+export const restockSweet = async (req, res) => {
+  try {
+    const { quantity } = req.body;
+    const sweet = await Sweet.findById(req.params.id);
+
+    if (!sweet) {
+      return res.status(404).json({
+        success: false,
+        message: "Sweet not found",
+      });
+    }
+
+    sweet.quantity += quantity;
+    await sweet.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Sweet restocked successfully",
+      data: sweet,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+
