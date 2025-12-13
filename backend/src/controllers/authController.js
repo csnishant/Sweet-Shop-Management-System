@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
@@ -40,7 +40,6 @@ export const registerUser = async (req, res, next) => {
     next(error);
   }
 };
-
 
 // @desc    Login user
 // @route   POST /api/auth/login
