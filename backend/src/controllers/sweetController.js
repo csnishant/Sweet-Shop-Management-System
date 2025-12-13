@@ -151,6 +151,66 @@ export const restockSweet = async (req, res) => {
     });
   }
 };
+export const updateSweet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, category, price, quantity } = req.body;
 
+    const sweet = await Sweet.findById(id);
+
+    if (!sweet) {
+      return res.status(404).json({
+        success: false,
+        message: "Sweet not found",
+      });
+    }
+
+    // update only provided fields
+    if (name) sweet.name = name;
+    if (category) sweet.category = category;
+    if (price !== undefined) sweet.price = price;
+    if (quantity !== undefined) sweet.quantity = quantity;
+
+    await sweet.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Sweet updated successfully",
+      data: sweet,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteSweet = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const sweet = await Sweet.findById(id);
+
+    if (!sweet) {
+      return res.status(404).json({
+        success: false,
+        message: "Sweet not found",
+      });
+    }
+
+    await sweet.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: "Sweet deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 
