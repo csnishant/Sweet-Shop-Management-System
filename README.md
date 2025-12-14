@@ -14,14 +14,12 @@ The **Sweet Shop Management System** is a full‑stack **Single Page Application
 * Express.js
 * MongoDB
 * JWT Authentication
-* Jest + Supertest (API Testing)
 
 ### Frontend
 
 * React.js
 * Vite
 * Tailwind CSS
-* React Testing Library / Cypress (UI Testing)
 
 ---
 
@@ -40,34 +38,6 @@ The **Sweet Shop Management System** is a full‑stack **Single Page Application
   * Delete sweets
   * Restock sweets
 * Responsive UI with SPA behavior
-
----
-
-## Folder Structure
-
-```
-sweet-shop/
-│
-├─ backend/
-│   ├─ controllers/
-│   ├─ models/
-│   ├─ routes/
-│   ├─ middleware/
-│   ├─ tests/
-│   ├─ server.js
-│   └─ package.json
-│
-├─ frontend/
-│   ├─ src/
-│   │   ├─ components/
-│   │   ├─ pages/
-│   │   ├─ services/
-│   │   └─ App.jsx
-│   ├─ vite.config.js
-│   └─ package.json
-│
-└─ README.md
-```
 
 ---
 
@@ -175,12 +145,4 @@ I used **ChatGPT** as an AI assistant throughout the development of this project
 
 ChatGPT significantly improved my development speed and helped me structure the project in a clean and scalable way. It reduced repetitive coding effort and provided clarity while implementing APIs and frontend components. However, all business logic, API integration, testing, and final implementation decisions were reviewed and implemented by me. AI was used as a support tool, not a replacement for understanding the code.
 
----
 
-## Repository Link
-
-Add your public GitHub or GitLab repository link here.
-
-## Live Demo (Optional)
-
-Add the deployed application link here if available.
