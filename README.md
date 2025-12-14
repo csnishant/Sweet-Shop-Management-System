@@ -120,9 +120,7 @@ Example usage:
 * Search & Filter Functionality: ✅ Passed
 * Purchase Button Disabled if Out of Stock: ✅ Passed
 * Admin Add / Update / Delete Sweet UI: ✅ Passed
-
-> Backend tests were implemented using **Jest + Supertest**. Frontend tests were implemented using **React Testing Library**. All major functionalities were tested successfully.
-
+  
 ---
 
 ## My AI Usage
