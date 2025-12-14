@@ -1,16 +1,32 @@
 import React, { useEffect, useState } from "react";
+import SweetCard from "../components/SweetCard";
 
 const Dashboard = () => {
   const [sweets, setSweets] = useState([]);
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+
   const token = localStorage.getItem("token");
 
-  // Fetch all sweets
+  // Fetch all sweets or filtered
   const fetchSweets = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/sweets", {
+      // Build query string dynamically
+      const queryParams = new URLSearchParams();
+      if (search) queryParams.append("name", search);
+      if (category && category !== "all")
+        queryParams.append("category", category);
+      if (minPrice) queryParams.append("minPrice", minPrice);
+      if (maxPrice) queryParams.append("maxPrice", maxPrice);
+
+      const url = `http://localhost:5000/api/sweets/search?${queryParams.toString()}`;
+
+      const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const data = await res.json();
       setSweets(data.data || []);
     } catch (err) {
@@ -20,21 +36,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchSweets();
-  }, []);
+  }, []); // fetch all on load
 
-  // Handle search
-  const handleSearch = async (e) => {
+  // Handle search/filter submit
+  const handleSearch = (e) => {
     e.preventDefault();
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/sweets/search?name=${search}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const data = await res.json();
-      setSweets(data.data || []);
-    } catch (err) {
-      console.error(err);
-    }
+    fetchSweets();
   };
 
   // Purchase sweet
@@ -49,7 +56,7 @@ const Dashboard = () => {
       );
       const data = await res.json();
       alert(data.message);
-      fetchSweets(); // Refresh list
+      fetchSweets();
     } catch (err) {
       console.error(err);
     }
@@ -61,47 +68,64 @@ const Dashboard = () => {
         Sweet Shop Dashboard
       </h1>
 
-      {/* Search */}
+      {/* Search & Filter Form */}
       <form
         onSubmit={handleSearch}
-        className="flex justify-center mb-6 space-x-2">
+        className="flex flex-col sm:flex-row justify-center gap-4 mb-6">
         <input
           type="text"
-          placeholder="Search sweets..."
-          className="px-4 py-2 rounded-full border focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64"
+          placeholder="Search sweet..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          className="px-4 py-2 rounded-full border w-64 focus:ring-2 focus:ring-indigo-500"
         />
+
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="px-4 py-2 rounded-full border focus:ring-2 focus:ring-indigo-500">
+          <option value="all">All Categories</option>
+          <option value="milk">Milk</option>
+          <option value="dry-fruit">Dry Fruit</option>
+          <option value="chocolate">Chocolate</option>
+        </select>
+
+        <input
+          type="number"
+          placeholder="Min Price"
+          value={minPrice}
+          onChange={(e) => setMinPrice(e.target.value)}
+          className="px-4 py-2 rounded-full border w-32 focus:ring-2 focus:ring-indigo-500"
+        />
+
+        <input
+          type="number"
+          placeholder="Max Price"
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(e.target.value)}
+          className="px-4 py-2 rounded-full border w-32 focus:ring-2 focus:ring-indigo-500"
+        />
+
         <button className="px-4 py-2 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition">
           Search
         </button>
       </form>
 
-      {/* Sweets List */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {sweets.map((sweet) => (
-          <div
-            key={sweet._id}
-            className="bg-white p-4 rounded-3xl shadow-2xl flex flex-col space-y-2">
-            <h2 className="text-xl font-semibold text-gray-800">
-              {sweet.name}
-            </h2>
-            <p className="text-gray-600">Category: {sweet.category}</p>
-            <p className="text-gray-600">Price: ${sweet.price}</p>
-            <p className="text-gray-600">Quantity: {sweet.quantity}</p>
-
-            <button
-              onClick={() => handlePurchase(sweet._id)}
-              disabled={sweet.quantity === 0}
-              className={`py-2 px-4 rounded-full font-medium transition ${
-                sweet.quantity === 0
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-500 hover:bg-green-600 text-white"
-              }`}>
-              {sweet.quantity === 0 ? "Out of Stock" : "Purchase"}
-            </button>
-          </div>
-        ))}
+      {/* Sweet Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {sweets.length > 0 ? (
+          sweets.map((sweet) => (
+            <SweetCard
+              key={sweet._id}
+              sweet={sweet}
+              onPurchase={handlePurchase}
+            />
+          ))
+        ) : (
+          <p className="text-center col-span-full text-gray-600">
+            No sweets found 🍬
+          </p>
+        )}
       </div>
     </div>
   );
