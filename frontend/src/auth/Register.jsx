@@ -3,9 +3,10 @@ import { useNavigate, Link } from "react-router-dom";
 
 const Register = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState(""); // ✅ Add username state
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user"); // ✅ Default role
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -14,14 +15,14 @@ const Register = () => {
       const res = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }), // ✅ use defined state
+        body: JSON.stringify({ username, email, password, role }), // ✅ Include role
       });
 
       const data = await res.json();
 
       if (data.token) {
         localStorage.setItem("token", data.token);
-        navigate("/");
+        navigate("/"); // redirect after registration
       } else {
         alert(data.message || "Registration failed");
       }
@@ -40,7 +41,7 @@ const Register = () => {
 
         <form className="space-y-4" onSubmit={handleRegister}>
           <input
-            type="text" // ✅ type text, not name
+            type="text"
             placeholder="Username"
             className="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
             value={username}
@@ -65,6 +66,15 @@ const Register = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
+          {/* Role Selection */}
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
 
           <button className="w-full bg-indigo-500 text-white py-3 rounded-2xl font-medium hover:bg-indigo-600 transition">
             Register

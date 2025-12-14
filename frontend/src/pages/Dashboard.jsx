@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ For redirect
 import SweetCard from "../components/SweetCard";
 
 const Dashboard = () => {
@@ -9,11 +10,17 @@ const Dashboard = () => {
   const [maxPrice, setMaxPrice] = useState("");
 
   const token = localStorage.getItem("token");
+  const navigate = useNavigate(); // ✅ Initialize navigate
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove token
+    navigate("/login"); // Redirect to login page
+  };
 
   // Fetch all sweets or filtered
   const fetchSweets = async () => {
     try {
-      // Build query string dynamically
       const queryParams = new URLSearchParams();
       if (search) queryParams.append("name", search);
       if (category && category !== "all")
@@ -22,11 +29,9 @@ const Dashboard = () => {
       if (maxPrice) queryParams.append("maxPrice", maxPrice);
 
       const url = `http://localhost:5000/api/sweets/search?${queryParams.toString()}`;
-
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       const data = await res.json();
       setSweets(data.data || []);
     } catch (err) {
@@ -36,7 +41,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchSweets();
-  }, []); // fetch all on load
+  }, []);
 
   // Handle search/filter submit
   const handleSearch = (e) => {
@@ -45,39 +50,44 @@ const Dashboard = () => {
   };
 
   // Purchase sweet
- const handlePurchase = async (id, quantity) => {
-   try {
-     const res = await fetch(
-       `http://localhost:5000/api/sweets/${id}/purchase`,
-       {
-         method: "POST",
-         headers: {
-           "Content-Type": "application/json",
-           Authorization: `Bearer ${token}`,
-         },
-         body: JSON.stringify({ quantity }), // Pass selected quantity
-       }
-     );
-
-     const data = await res.json();
-     alert(data.message);
-
-     fetchSweets(); // Refresh list
-   } catch (err) {
-     console.error(err);
-   }
- };
-
+  const handlePurchase = async (id, quantity) => {
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/sweets/${id}/purchase`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ quantity }),
+        }
+      );
+      const data = await res.json();
+      alert(data.message);
+      fetchSweets();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-        Sweet Shop Dashboard
-      </h1>
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">
+          Sweet Shop Dashboard
+        </h1>
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition">
+          Logout
+        </button>
+      </div>
 
       {/* Search & Filter Form */}
       <form
-        onSubmit={handleSearch}
+        onSubmit={handleSearch}r
         className="flex flex-col sm:flex-row justify-center gap-4 mb-6">
         <input
           type="text"
@@ -86,7 +96,6 @@ const Dashboard = () => {
           onChange={(e) => setSearch(e.target.value)}
           className="px-4 py-2 rounded-full border w-64 focus:ring-2 focus:ring-indigo-500"
         />
-
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
@@ -96,7 +105,6 @@ const Dashboard = () => {
           <option value="dry-fruit">Dry Fruit</option>
           <option value="chocolate">Chocolate</option>
         </select>
-
         <input
           type="number"
           placeholder="Min Price"
@@ -104,7 +112,6 @@ const Dashboard = () => {
           onChange={(e) => setMinPrice(e.target.value)}
           className="px-4 py-2 rounded-full border w-32 focus:ring-2 focus:ring-indigo-500"
         />
-
         <input
           type="number"
           placeholder="Max Price"
@@ -112,7 +119,6 @@ const Dashboard = () => {
           onChange={(e) => setMaxPrice(e.target.value)}
           className="px-4 py-2 rounded-full border w-32 focus:ring-2 focus:ring-indigo-500"
         />
-
         <button className="px-4 py-2 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition">
           Search
         </button>

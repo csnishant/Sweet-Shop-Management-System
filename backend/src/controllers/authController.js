@@ -14,19 +14,31 @@ const generateToken = (id) => {
 // @access  Public
 export const registerUser = async (req, res, next) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, role } = req.body;
+
+    // Validate role
+    const allowedRoles = ["user", "admin"];
+    const userRole = allowedRoles.includes(role) ? role : "user"; // default to "user"
 
     // Debug log
     console.log("Register request body:", req.body);
 
+    // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
-      console.log("User already exists:", email); // debug
+      console.log("User already exists:", email);
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = await User.create({ username, email, password });
-    console.log("User created:", user); // debug
+    // Create user with role
+    const user = await User.create({
+      username,
+      email,
+      password,
+      role: userRole,
+    });
+
+    console.log("User created:", user);
 
     res.status(201).json({
       _id: user._id,
@@ -36,7 +48,7 @@ export const registerUser = async (req, res, next) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    console.log("Error in registerUser:", error); // debug
+    console.log("Error in registerUser:", error);
     next(error);
   }
 };
@@ -47,6 +59,7 @@ export const registerUser = async (req, res, next) => {
 export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+console.log("Login request body:", req.body);
 
     // Find user
     const user = await User.findOne({ email });

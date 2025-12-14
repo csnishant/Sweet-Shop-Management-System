@@ -19,8 +19,16 @@ const Login = () => {
       const data = await res.json();
 
       if (data.token) {
+        // Store token and role
         localStorage.setItem("token", data.token);
-        navigate("/");
+        localStorage.setItem("role", data.role);
+
+        // Redirect based on role
+        if (data.role === "admin") {
+          navigate("/admin"); // ✅ Admin dashboard
+        } else {
+          navigate("/"); // Normal user dashboard
+        }
       } else {
         alert(data.message || "Login failed");
       }
@@ -44,7 +52,6 @@ const Login = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-
           <input
             type="password"
             placeholder="Password"
@@ -60,7 +67,7 @@ const Login = () => {
         </form>
 
         <p className="text-center text-gray-500">
-          Don't have an account?{" "}
+          Don’t have an account?{" "}
           <Link to="/register" className="text-indigo-500 font-semibold">
             Register
           </Link>
