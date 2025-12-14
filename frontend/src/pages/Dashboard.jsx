@@ -45,22 +45,29 @@ const Dashboard = () => {
   };
 
   // Purchase sweet
-  const handlePurchase = async (id) => {
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/sweets/${id}/purchase`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const data = await res.json();
-      alert(data.message);
-      fetchSweets();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+ const handlePurchase = async (id, quantity) => {
+   try {
+     const res = await fetch(
+       `http://localhost:5000/api/sweets/${id}/purchase`,
+       {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+           Authorization: `Bearer ${token}`,
+         },
+         body: JSON.stringify({ quantity }), // Pass selected quantity
+       }
+     );
+
+     const data = await res.json();
+     alert(data.message);
+
+     fetchSweets(); // Refresh list
+   } catch (err) {
+     console.error(err);
+   }
+ };
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
